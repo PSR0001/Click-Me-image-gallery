@@ -19,9 +19,13 @@ function setup() {
         // console.log(data);
         const options = {
             method: 'POST',
+            mode: 'cors', 
+            cache: 'no-cache', 
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json'
             },
+            referrerPolicy: 'no-referrer',
             body: JSON.stringify(data)
         };
         const response = await fetch('/api', options);
