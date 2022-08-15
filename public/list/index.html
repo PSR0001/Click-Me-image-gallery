@@ -5,69 +5,133 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <link rel="stylesheet" type="text/css" href="../style.css" />
-  <title>Document</title>
+  <!-- <link rel="stylesheet" type="text/css" href="../style.css" /> -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <title>Image-Gallery</title>
 </head>
 
 <body>
-  <h1>Camera</h1>
-  <div><a href="/">Camera</a> | <a href="/list">list</a></div>
-  <br />
-  <div>sort by <a href="#" id="time">time</a> | <a href="#" id="mood">Name</a></div>
+  <div class="container border rounded-3 shadow mt-5">
+    <section class="mt-2">
+      <ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
+        <li class="nav-item" role="presentation">
+          <a class="nav-link active" id="tab-login" data-mdb-toggle="pill" href="/" role="tab"
+            aria-controls="pills-login" aria-selected="true">Enter</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" id="tab-register" data-mdb-toggle="pill" href="/list" role="tab"
+            aria-controls="pills-register" aria-selected="false">List</a>
+        </li>
+      </ul>
+    </section>
+    <section>
+      <center>
+        <h2>Image-Gallery</h2>
+        <div>sort by <a href="#" id="time">time</a> | <a href="#" id="mood">Name</a></div>
+      </center>
+    </section>
+    <section class="mb-2">
 
-  <script>
-    getData();
+      <!-- cards -->
+      <div class="card" style="width: 18rem;">
+        <img
+          src="https://images.unsplash.com/reserve/NFuTknHQTsOc0uHAA4E4_4968226460_33fb941a16_o.jpg?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1174&q=80"
+          class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Card title</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+            content.</p>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Launch demo modal
+          </button>
+        </div>
+      </div>
+      <div class="modal fade modal-dialog " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              ...
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+      </div>
+    </div>
+    </section>
+   
 
-    const selfies = [];
+  </div>
 
-    document.getElementById('time').addEventListener('click', event => {
-      sortData((a, b) => b.time - a.time);
-    });
 
-    document.getElementById('mood').addEventListener('click', event => {
-      sortData((a, b) => {
-        if (b.mood > a.mood) return -1;
-        else return 1;
+
+
+
+
+    <script>
+      getData();
+
+      const selfies = [];
+
+      document.getElementById('time').addEventListener('click', event => {
+        sortData((a, b) => b.time - a.time);
       });
-    });
 
-    function sortData(compare) {
-      for (let item of selfies) {
-        item.elt.remove();
+      document.getElementById('mood').addEventListener('click', event => {
+        sortData((a, b) => {
+          if (b.mood > a.mood) return -1;
+          else return 1;
+        });
+      });
+
+      function sortData(compare) {
+        for (let item of selfies) {
+          item.elt.remove();
+        }
+        selfies.sort(compare);
+        for (let item of selfies) {
+          document.body.append(item.elt);
+        }
       }
-      selfies.sort(compare);
-      for (let item of selfies) {
-        document.body.append(item.elt);
+
+      async function getData() {
+        const response = await fetch('/api');
+        const data = await response.json();
+
+        for (item of data) {
+          const root = document.createElement('p');
+          const mood = document.createElement('div');
+          const geo = document.createElement('div');
+          const date = document.createElement('div');
+          const image = document.createElement('img');
+
+          mood.textContent = `Name: ${item.mood}`;
+          geo.textContent = `${item.lat}°, ${item.lon}°`;
+          const dateString = new Date(item.timestamp).toLocaleString();
+          date.textContent = dateString;
+          image.src = item.image64;
+          image.alt = 'itsCool';
+
+          root.append(mood, geo, date, image);
+
+          selfies.push({ elt: root, time: item.timestamp, mood: item.mood });
+          document.body.append(root);
+        }
+        console.log(data);
       }
-    }
 
-    async function getData() {
-      const response = await fetch('/api');
-      const data = await response.json();
-
-      for (item of data) {
-        const root = document.createElement('p');
-        const mood = document.createElement('div');
-        const geo = document.createElement('div');
-        const date = document.createElement('div');
-        const image = document.createElement('img');
-
-        mood.textContent = `Name: ${item.mood}`;
-        geo.textContent = `${item.lat}°, ${item.lon}°`;
-        const dateString = new Date(item.timestamp).toLocaleString();
-        date.textContent = dateString;
-        image.src = item.image64;
-        image.alt = 'Dan Shiffman making silly faces.';
-
-        root.append(mood, geo, date, image);
-
-        selfies.push({ elt: root, time: item.timestamp, mood: item.mood });
-        document.body.append(root);
-      }
-      console.log(data);
-    }
-
-  </script>
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"></script>
 </body>
 
 </html>
